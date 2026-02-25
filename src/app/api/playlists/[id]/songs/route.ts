@@ -3,16 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export async function POST(
-    req: NextRequest,
-    { params }: { params: { id: string } }
-) {
+// Next.js 15+: params is a Promise
+type Context = { params: Promise<{ id: string }> };
+
+export async function POST(req: NextRequest, { params }: Context) {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { song } = await req.json();
 
-    // 1. Ensure song exists in Song table
     await prisma.song.upsert({
         where: { id: song.id.toString() },
         update: {},
@@ -27,10 +27,9 @@ export async function POST(
         },
     });
 
-    // 2. Add song to playlist
     const playlistSong = await prisma.playlistSong.create({
         data: {
-            playlistId: params.id,
+            playlistId: id,
             songId: song.id.toString(),
         },
     });
@@ -38,10 +37,8 @@ export async function POST(
     return NextResponse.json(playlistSong);
 }
 
-export async function DELETE(
-    req: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: Context) {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -49,10 +46,7 @@ export async function DELETE(
 
     await prisma.playlistSong.delete({
         where: {
-            playlistId_songId: {
-                playlistId: params.id,
-                songId,
-            },
+            playlistId_songId: { playlistId: id, songId },
         },
     });
 
