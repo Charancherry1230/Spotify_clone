@@ -1,35 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTrack, DeezerTrack } from "@/lib/music";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import Image from "next/image";
 import { Play, Clock, MoreHorizontal } from "lucide-react";
+import { use } from "react";
+
+interface PlaylistSong {
+    song: {
+        id: string;
+        title: string;
+        artist: string;
+        albumName: string | null;
+        albumCover: string | null;
+        duration: number | null;
+        previewUrl: string | null;
+    };
+}
 
 interface Playlist {
     id: string;
     name: string;
-    songs: { song: DeezerTrack }[];
+    songs: PlaylistSong[];
 }
 
-export default function PlaylistPage({ params }: { params: { id: string } }) {
-    const [playlist, setPlaylist] = useState<any>(null);
+// Next.js 15+: params is a Promise in client pages too
+export default function PlaylistPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    const [playlist, setPlaylist] = useState<Playlist | null>(null);
     const { setCurrentSong } = usePlayerStore();
 
     useEffect(() => {
-        fetch(`/api/playlists/${params.id}`)
+        fetch(`/api/playlists/${id}`)
             .then(res => res.json())
             .then(setPlaylist);
-    }, [params.id]);
+    }, [id]);
 
-    const onPlay = (track: any) => {
+    const onPlay = (track: PlaylistSong["song"]) => {
         setCurrentSong({
-            id: track.id.toString(),
+            id: track.id,
             title: track.title,
             artist: track.artist,
-            albumCover: track.albumCover,
-            previewUrl: track.previewUrl,
-            duration: track.duration,
+            albumCover: track.albumCover || "",
+            previewUrl: track.previewUrl || "",
+            duration: track.duration || 0,
         });
     };
 
@@ -39,18 +53,20 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
         <div className="flex flex-col h-full bg-gradient-to-b from-neutral-800 to-black p-8">
             <div className="flex items-end space-x-6 mb-8">
                 <div className="relative w-52 h-52 shadow-[0_8px_40px_rgba(0,0,0,0.5)] rounded-md overflow-hidden bg-neutral-800">
-                    <Image
-                        src={playlist.songs[0]?.song.albumCover || "https://e-cdns-images.dzcdn.net/images/cover/500x500-000000-80-0-0.jpg"}
-                        alt={playlist.name}
-                        fill
-                        className="object-cover"
-                    />
+                    {playlist.songs[0]?.song.albumCover && (
+                        <Image
+                            src={playlist.songs[0].song.albumCover}
+                            alt={playlist.name}
+                            fill
+                            className="object-cover"
+                        />
+                    )}
                 </div>
                 <div className="flex flex-col space-y-2">
                     <span className="text-xs font-bold uppercase">Playlist</span>
                     <h1 className="text-7xl font-black tracking-tight mb-2">{playlist.name}</h1>
                     <div className="flex items-center space-x-2 text-sm text-neutral-300">
-                        <span className="font-bold text-white">Your Clone</span>
+                        <span className="font-bold text-white">TeluguBeats</span>
                         <span>•</span>
                         <span>{playlist.songs.length} songs</span>
                     </div>
@@ -77,7 +93,7 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                 </div>
 
                 <div className="flex flex-col">
-                    {playlist.songs.map((item: any, index: number) => (
+                    {playlist.songs.map((item, index) => (
                         <div
                             key={item.song.id}
                             onClick={() => onPlay(item.song)}
@@ -87,16 +103,13 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                                 {index + 1}
                             </span>
                             <div className="flex items-center space-x-4">
-                                <div className="relative w-10 h-10 rounded">
-                                    <Image
-                                        src={item.song.albumCover}
-                                        alt={item.song.title}
-                                        fill
-                                        className="object-cover"
-                                    />
+                                <div className="relative w-10 h-10 rounded overflow-hidden bg-neutral-700">
+                                    {item.song.albumCover && (
+                                        <Image src={item.song.albumCover} alt={item.song.title} fill className="object-cover" />
+                                    )}
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-white font-medium truncate group-hover:text-spotify-green" style={{ transition: 'color 0.2s' }}>{item.song.title}</span>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-white font-medium truncate group-hover:text-spotify-green" style={{ transition: "color 0.2s" }}>{item.song.title}</span>
                                     <span className="text-neutral-400 text-xs truncate group-hover:text-white">{item.song.artist}</span>
                                 </div>
                             </div>
@@ -104,7 +117,9 @@ export default function PlaylistPage({ params }: { params: { id: string } }) {
                                 {item.song.albumName || "Unknown Album"}
                             </span>
                             <span className="flex items-center justify-end text-neutral-400 text-sm tabular-nums group-hover:text-white">
-                                {Math.floor(item.song.duration / 60)}:{(item.song.duration % 60).toString().padStart(2, "0")}
+                                {item.song.duration
+                                    ? `${Math.floor(item.song.duration / 60)}:${(item.song.duration % 60).toString().padStart(2, "0")}`
+                                    : "--:--"}
                             </span>
                         </div>
                     ))}
