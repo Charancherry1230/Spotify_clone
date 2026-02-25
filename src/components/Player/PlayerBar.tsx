@@ -4,14 +4,12 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from "lucide-react";
 import Image from "next/image";
-
-// Extend window for YouTube IFrame API
 declare global {
     interface Window {
-        YT: typeof YT;
         onYouTubeIframeAPIReady: () => void;
     }
 }
+
 
 function formatTime(sec: number) {
     if (!sec || isNaN(sec)) return "0:00";
