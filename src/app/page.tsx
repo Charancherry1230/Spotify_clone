@@ -25,10 +25,10 @@ export default function Home() {
           </h1>
           <p className="text-neutral-400 text-lg">Stream your favourite Telugu hits, albums & more.</p>
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/dashboard")}
             className="px-12 py-4 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-full transition-all scale-100 hover:scale-105 active:scale-95"
           >
-            GET STARTED
+            START LISTENING
           </button>
         </div>
       )}
