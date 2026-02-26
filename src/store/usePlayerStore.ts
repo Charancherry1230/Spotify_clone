@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getChart } from "@/lib/music";
 
 interface Song {
     id: string;
@@ -21,11 +22,11 @@ interface PlayerStore {
     setPlaying: (isPlaying: boolean) => void;
     setVolume: (volume: number) => void;
     addToQueue: (song: Song) => void;
-    playNext: () => void;
-    playPrevious: () => void;
+    playNext: () => Promise<void>;
+    playPrevious: () => Promise<void>;
 }
 
-export const usePlayerStore = create<PlayerStore>((set) => ({
+export const usePlayerStore = create<PlayerStore>((set, get) => ({
     currentSong: null,
     isPlaying: false,
     volume: 0.5,
@@ -38,23 +39,69 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
     setVolume: (volume) => set({ volume }),
     addToQueue: (song) => set((state) => ({ queue: [...state.queue, song] })),
 
-    playNext: () => set((state) => {
-        if (state.queue.length === 0) return state;
+    playNext: async () => {
+        const state = get();
+        if (state.queue.length === 0) {
+            try {
+                const charts = await getChart();
+                if (charts.length > 0) {
+                    const randomTrack = charts[Math.floor(Math.random() * charts.length)];
+                    set({
+                        currentSong: {
+                            id: randomTrack.id.toString(),
+                            title: randomTrack.title,
+                            artist: randomTrack.artist.name,
+                            albumCover: randomTrack.album.cover_medium,
+                            previewUrl: randomTrack.preview,
+                            duration: randomTrack.duration,
+                        },
+                        isPlaying: true,
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch random song", error);
+            }
+            return;
+        }
+
         const nextIndex = (state.currentIndex + 1) % state.queue.length;
-        return {
+        set({
             currentSong: state.queue[nextIndex],
             currentIndex: nextIndex,
             isPlaying: true,
-        };
-    }),
+        });
+    },
 
-    playPrevious: () => set((state) => {
-        if (state.queue.length === 0) return state;
+    playPrevious: async () => {
+        const state = get();
+        if (state.queue.length === 0) {
+            try {
+                const charts = await getChart();
+                if (charts.length > 0) {
+                    const randomTrack = charts[Math.floor(Math.random() * charts.length)];
+                    set({
+                        currentSong: {
+                            id: randomTrack.id.toString(),
+                            title: randomTrack.title,
+                            artist: randomTrack.artist.name,
+                            albumCover: randomTrack.album.cover_medium,
+                            previewUrl: randomTrack.preview,
+                            duration: randomTrack.duration,
+                        },
+                        isPlaying: true,
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch random song", error);
+            }
+            return;
+        }
+
         const prevIndex = (state.currentIndex - 1 + state.queue.length) % state.queue.length;
-        return {
+        set({
             currentSong: state.queue[prevIndex],
             currentIndex: prevIndex,
             isPlaying: true,
-        };
-    }),
+        });
+    },
 }));

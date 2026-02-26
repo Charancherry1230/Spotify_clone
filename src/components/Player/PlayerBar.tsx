@@ -138,26 +138,26 @@ export default function PlayerBar() {
     if (!currentSong) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 h-24 bg-black/90 backdrop-blur-lg border-t border-white/10 px-4 flex items-center justify-between z-50">
+        <div className="fixed md:bottom-0 bottom-16 left-0 right-0 md:h-24 h-[60px] bg-black/90 backdrop-blur-lg border-t border-white/10 px-2 md:px-4 flex items-center justify-between z-50">
             {/* Hidden YouTube player */}
             <div className="absolute -top-0 left-0 opacity-0 pointer-events-none w-0 h-0 overflow-hidden">
                 <div ref={iframeContainerRef} />
             </div>
 
             {/* Left: Song info */}
-            <div className="flex items-center space-x-4 w-[30%]">
-                <div className="relative w-14 h-14 rounded-md overflow-hidden bg-neutral-800 flex-shrink-0">
+            <div className="flex items-center space-x-3 w-auto md:w-[30%] max-w-[50%] md:max-w-none">
+                <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-md overflow-hidden bg-neutral-800 flex-shrink-0">
                     {currentSong.albumCover && (
                         <Image src={currentSong.albumCover} alt={currentSong.title} fill className="object-cover" />
                     )}
                 </div>
                 <div className="flex flex-col min-w-0">
                     <div className="flex items-center space-x-2">
-                        <span className="text-white text-sm font-semibold truncate hover:underline cursor-pointer">
+                        <span className="text-white text-xs md:text-sm font-semibold truncate hover:underline cursor-pointer">
                             {currentSong.title}
                         </span>
                         {isPlaying && (
-                            <div className="flex items-end space-x-[2px] h-4 flex-shrink-0">
+                            <div className="hidden md:flex items-end space-x-[2px] h-4 flex-shrink-0">
                                 <div className="equalizer-bar" />
                                 <div className="equalizer-bar" />
                                 <div className="equalizer-bar" />
@@ -165,38 +165,38 @@ export default function PlayerBar() {
                             </div>
                         )}
                     </div>
-                    <span className="text-neutral-400 text-xs truncate hover:underline cursor-pointer">
+                    <span className="text-neutral-400 text-[10px] md:text-xs truncate hover:underline cursor-pointer">
                         {currentSong.artist}
                     </span>
                 </div>
             </div>
 
             {/* Center: Controls + seek */}
-            <div className="flex flex-col items-center space-y-2 w-[40%]">
-                <div className="flex items-center space-x-6">
-                    <Shuffle className="w-4 h-4 text-neutral-400 hover:text-white transition-colors cursor-pointer" />
+            <div className="flex flex-row md:flex-col items-center justify-end md:justify-center flex-1 md:w-[40%] space-x-4 md:space-x-0 md:space-y-2 pr-2 md:pr-0">
+                <div className="flex items-center md:space-x-6 space-x-4">
+                    <Shuffle className="hidden md:block w-4 h-4 text-neutral-400 hover:text-white transition-colors cursor-pointer" />
                     <SkipBack
                         onClick={playPrevious}
                         className="w-5 h-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
                     />
                     <button
                         onClick={togglePlay}
-                        className="w-10 h-10 flex items-center justify-center bg-white rounded-full hover:scale-105 transition-transform active:scale-95"
+                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white rounded-full hover:scale-105 transition-transform active:scale-95"
                     >
                         {isPlaying ? (
-                            <Pause className="w-5 h-5 text-black fill-black" />
+                            <Pause className="w-4 h-4 md:w-5 md:h-5 text-black fill-black" />
                         ) : (
-                            <Play className="w-5 h-5 text-black fill-black ml-1" />
+                            <Play className="w-4 h-4 md:w-5 md:h-5 text-black fill-black ml-1" />
                         )}
                     </button>
                     <SkipForward
                         onClick={playNext}
                         className="w-5 h-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
                     />
-                    <Repeat className="w-4 h-4 text-neutral-400 hover:text-white transition-colors cursor-pointer" />
+                    <Repeat className="hidden md:block w-4 h-4 text-neutral-400 hover:text-white transition-colors cursor-pointer" />
                 </div>
 
-                <div className="flex items-center space-x-2 w-full max-w-md">
+                <div className="hidden md:flex items-center space-x-2 w-full max-w-md">
                     <span className="text-[10px] text-neutral-400 w-10 text-right">{formatTime(currentTime)}</span>
                     <div
                         className="flex-1 h-1 bg-neutral-600 rounded-full overflow-hidden cursor-pointer group relative"
@@ -212,7 +212,7 @@ export default function PlayerBar() {
             </div>
 
             {/* Right: Volume */}
-            <div className="flex items-center justify-end space-x-4 w-[30%]">
+            <div className="hidden md:flex items-center justify-end space-x-4 w-[30%]">
                 <div className="flex items-center space-x-2 w-32">
                     <Volume2 className="w-5 h-5 text-neutral-400 flex-shrink-0" />
                     <div

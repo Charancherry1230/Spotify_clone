@@ -27,7 +27,7 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-black w-[240px] border-r border-white/10 p-6 space-y-8">
+        <div className="hidden md:flex flex-col h-full bg-black w-[240px] border-r border-white/10 p-6 space-y-8">
             <div className="flex items-center space-x-2 px-2" style={{ color: "#1DB954" }}>
                 <LayoutDashboard className="w-8 h-8" />
                 <span className="text-xl font-bold text-white tracking-tight">TeluguBeats</span>

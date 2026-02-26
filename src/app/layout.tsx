@@ -4,6 +4,7 @@ import "./globals.css";
 import Sidebar from "@/components/Navigation/Sidebar";
 import PlayerBar from "@/components/Player/PlayerBar";
 import AuthProvider from "@/components/Providers/AuthProvider";
+import MobileNav from "@/components/Navigation/MobileNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,11 +24,12 @@ export default function RootLayout({
         <AuthProvider>
           <div className="flex h-full w-full">
             <Sidebar />
-            <main className="flex-1 overflow-y-auto relative pb-24 no-scrollbar">
+            <main className="flex-1 overflow-y-auto relative pb-32 md:pb-24 no-scrollbar">
               {children}
             </main>
           </div>
           <PlayerBar />
+          <MobileNav />
         </AuthProvider>
       </body>
     </html>
